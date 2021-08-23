@@ -69,7 +69,10 @@ class Jkdk:
         bs4 = BeautifulSoup(text, 'lxml')
         body = bs4.find('span')
         text = body.string
-        if text == '今日您还没有填报过':
+
+        # 少考虑了填报不成功的情况
+
+        if text == '今日您还没有填报过' or text == '今日您未成功填报过，请重新上报':
             return False
         else:
             return True
@@ -171,9 +174,9 @@ class Jkdk:
             "myvs_13a": self.province,
             "myvs_13b": self.city,
             "myvs_13c": self.position,
-            "myvs_14": "否",
-            "myvs_14b": "",
+            'myvs_13': 'g',
             "memo22": "[待定]",
+            'myvs_24': '否',
             "did": "2",
             "door": "",
             "day6": "b",
@@ -181,8 +184,8 @@ class Jkdk:
             "sheng6": "",
             "shi6": "",
             "fun3": "",
-            "jingdu": "0.0000",
-            "weidu": "0.0000",
+            "jingdu": "0.000000",
+            "weidu": "0.000000",
             "ptopid": self.ptopid,
             "sid": self.sid
         }
