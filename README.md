@@ -2,7 +2,6 @@
 
 ## 郑州大学健康打卡
 
-
 目前发现打卡界面记录**IP地址**，不过仍能打卡成功，尚不清楚有何影响。请谨慎使用。
 
 ---
@@ -19,27 +18,20 @@
 
 3. 添加5个仓库密钥 username、password、province、city、position，分别表示学号、密码、省份、城市和具体位置
 
-![添加仓库密钥](./images/secret.png)
+   ![添加仓库密钥](./images/secret.png)
 
-![添加学号](./images/username.png)
+   ![添加学号](./images/username.png)
 
-添加学号，name必须是username
+   - 添加学号，name必须是username
+   - 密码的添加同理，但name必须是password
+   - 添加省份，省份的name必须是province，value是参考
+     https://gist.github.com/mayufo/4207ed3fa925e6b3df7559832af85165
+     是所对应数字的前两位
+   - 城市的name必须是city，value是上面链接对应数字的第三、四位
+   - 详细地址就没有要求，但是name必须是position
 
-
-密码的添加同理，但name必须是password
-
-
-添加省份，省份的name必须是province，value是参考
-https://gist.github.com/mayufo/4207ed3fa925e6b3df7559832af85165
-是所对应数字的前两位
-
-
-城市的name必须是city，value是上面链接对应数字的第三、四位
-
-
-详细地址就没有要求，但是name必须是position
-
-4. 结束。接下来会每日6点、6点10分和7点、7点10分自动打卡（多次打卡防止打卡失败）。不过这里建议自己修改 .github/workflows里面的 jkdk.yml 里的时间，注意修改为**UTC时间**，即比北京时间晚8个小时，具体可以参考有北京时间注释的那一行。
+4. 然后在左边的找到actions，选择enable action，这样就激活了action
+5. 结束。接下来会每日6点、6点10分和7点、7点10分自动打卡（多次打卡防止打卡失败）。不过这里**第一次**建议自己修改 .github/workflows 里面的 jkdk.yml 里的时间以进行一次打卡看看效果（有时候会因为网络问题打卡失败，不过因为设置了**多次打卡**的缘故，失败的几率会降低），注意修改为**UTC时间**，即比北京时间晚8个小时，具体可以参考有北京时间注释的那一行。
 
 ---
 
@@ -49,6 +41,8 @@ https://gist.github.com/mayufo/4207ed3fa925e6b3df7559832af85165
 
 2. 把调用代码SKEY保存下来，按照上文添加学号密码的方法，添加到secrets中，其中Name是key，value是你的SKEY
 
-   ![skey](./images/SKEY.png)
+   
+
+![skey](./images/SKEY.png)
 
 3. 按照网站所说，关注微信号，最后成功添加微信通知。

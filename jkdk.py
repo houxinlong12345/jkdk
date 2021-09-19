@@ -32,6 +32,7 @@ class Jkdk:
         self._upw = upw  # 密码
         self.ptopid = ''
         self.sid = ''
+        self.form = {}
 
     def encode(self, page):
         text = page.text.encode(page.encoding).decode(page.apparent_encoding)
@@ -71,7 +72,6 @@ class Jkdk:
         text = body.string
 
         # 少考虑了填报不成功的情况
-
         if text == '今日您还没有填报过' or text == '今日您未成功填报过，请重新上报':
             return False
         else:
@@ -137,6 +137,19 @@ class Jkdk:
         self.src = self.parse(text=text, label='form', attrs={
             'name': 'myform52'}, target='action')
 
+    def get_form2(self, text, label: str, attrs: dict):
+        bs4 = BeautifulSoup(text, 'lxml')
+        body = bs4.find(label, attrs=attrs)
+
+        data = body.find_all('input')
+        for i in data:
+            self.form[i.get('name')] = i.get('value')
+        self.form['myvs_13'] = 'g'
+        self.form["myvs_13a"] = self.province
+        self.form["myvs_13b"] = self.city
+        self.form["myvs_13c"] = self.position
+        self.form['myvs_26'] = '2'
+
     def jkdk4(self, session):
 
         form1 = {
@@ -154,43 +167,13 @@ class Jkdk:
         with open('test4.html', 'w') as f:
             f.write(text)
 
+        self.get_form2(text=text, label='form', attrs={'name': 'myform52'})
         self.src = self.parse(text=text, label='form', attrs={
             'name': 'myform52'}, target='action')
 
     def jkdk5(self, session) -> bool:
-        form2 = {
-            "myvs_1": "否",
-            "myvs_2": "否",
-            "myvs_3": "否",
-            "myvs_4": "否",
-            "myvs_5": "否",
-            "myvs_6": "否",
-            "myvs_7": "否",
-            "myvs_8": "否",
-            "myvs_9": "否",
-            "myvs_10": "否",
-            "myvs_11": "否",
-            "myvs_12": "否",
-            "myvs_13a": self.province,
-            "myvs_13b": self.city,
-            "myvs_13c": self.position,
-            'myvs_13': 'g',
-            "memo22": "[待定]",
-            'myvs_24': '否',
-            "did": "2",
-            "door": "",
-            "day6": "b",
-            "men6": "a",
-            "sheng6": "",
-            "shi6": "",
-            "fun3": "",
-            "jingdu": "0.000000",
-            "weidu": "0.000000",
-            "ptopid": self.ptopid,
-            "sid": self.sid
-        }
 
-        page = session.post(self.src, data=form2,
+        page = session.post(self.src, data=self.form,
                             headers=self.headers)  # 填表
 
         text = self.encode(page)
@@ -220,10 +203,7 @@ class Jkdk:
     def jkdk(self):
         session = requests.Session()
         self.jkdk1(session)
-        time.sleep(5)
         self.jkdk2(session=session)
-        time.sleep(5)
         self.jkdk3(session)
-        time.sleep(5)
         self.jkdk4(session=session)
         result = self.jkdk5(session=session)
