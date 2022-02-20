@@ -41,7 +41,7 @@
 ### 原先微信接口已经失效，替换为新的微信接口
 ### 使用方法
 1. 扫描此微信二维码并关注微信公众号
-[二维码](http://wxpusher.zjiecode.com/api/qrcode/nublfXxSDMf21fizk3NQntHrtvKnjlrITfUWKroLTNn5oU7Pm4V7qoRAfWdd2jW6.jpg)
+[二维码](http://wxpusher.zjiecode.com/api/qrcode/hNHQXsGvGguORhwBHItWlaqUYvs79Ii59RpFN5YmuDIBOiO8YLQlqHd051TBfmeO.jpg)
 
 2. 在右下角”我的“这一栏中把UID替换到原先secrets中的微信key中即可
 
