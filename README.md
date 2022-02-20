@@ -38,13 +38,10 @@
 ---
 
 ## 添加微信通知的方法
+### 原先微信接口已经失效，替换为新的微信接口
+### 使用方法
+1. 扫描此微信二维码并关注微信公众号
+[二维码](http://wxpusher.zjiecode.com/api/qrcode/nublfXxSDMf21fizk3NQntHrtvKnjlrITfUWKroLTNn5oU7Pm4V7qoRAfWdd2jW6.jpg)
 
-1. 注册 https://cp.xuthus.cc/ 这个网站，然后在增强里面，下滑到微信推送，绑定微信账号
+2. 在右下角”我的“这一栏中把UID替换到原先secrets中的微信key中即可
 
-2. 把调用代码SKEY保存下来，按照上文添加学号密码的方法，添加到secrets中，其中Name是key，value是你的SKEY
-
-   
-
-![skey](./images/SKEY.png)
-
-3. 按照网站所说，关注微信号，最后成功添加微信通知。

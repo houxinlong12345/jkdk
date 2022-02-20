@@ -17,7 +17,7 @@ class Jkdk:
         self.province = province
         self.city = city
         self.position = position
-        self.url = 'https://push.xuthus.cc/wx/'
+        self.url = 'https://service-rnuqqxkb-1300650038.sh.apigw.tencentcs.com/release/getuid'
 
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0',
@@ -56,8 +56,7 @@ class Jkdk:
 
     def push_err(self, err: str):
         try:
-            requests.get(self.url+self.key +
-                         '/?c='+err)
+            requests.post(self.url, json={'uid': self.key, 'content': err})
         except:
             print('微信推送也失败，你只能手动查看是否成功了')
             exit(-1)
@@ -130,7 +129,7 @@ class Jkdk:
         if self.ifSigned(text) is True:
             print('您已经打过卡了')
             if self.key is not None:
-                requests.get(self.url+self.key+'/?c=您已经打过卡了')
+                requests.post(self.url, json={'uid': self.key, 'content': '您已经打过卡了'})
                 print('微信推送成功')
             exit(0)
 
@@ -191,13 +190,13 @@ class Jkdk:
         if len(output):
             print('好耶')
             if self.key is not None:
-                requests.get(self.url+self.key+'/?c=打卡成功')
+                requests.post(self.url, json={'uid': self.key, 'content': '打卡成功'})
                 print('微信推送成功')
             return True
         else:
             print('不好')
             if self.key is not None:
-                requests.get(self.url+self.key+'/?c=打卡失败')
+                requests.post(self.url, json={'uid': self.key, 'content': '打卡失败'})
             return False
 
     def jkdk(self):
