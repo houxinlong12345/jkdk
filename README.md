@@ -6,6 +6,8 @@
 
 注意：项目启用后60天无更新时，Actions功能会**自动关闭**，届时需要再次手动开启。
 
+### 原先的微信接口失效了，现已更换新的微信接口，见最下面。
+
 ---
 
 ## 使用方法
@@ -43,5 +45,5 @@
 1. 扫描此微信二维码并关注微信公众号
 [二维码](http://wxpusher.zjiecode.com/api/qrcode/hNHQXsGvGguORhwBHItWlaqUYvs79Ii59RpFN5YmuDIBOiO8YLQlqHd051TBfmeO.jpg)
 
-2. 在右下角”我的“这一栏中把UID替换到原先secrets中的微信key中即可
+2. 关注后在右下角”我的“这一栏中把UID替换到原先secrets中的微信key中即可，除此之外，关注后会有消息通知uid的值。
 
