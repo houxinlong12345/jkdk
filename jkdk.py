@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 class Jkdk:
     def __init__(self, uid, upw, key, province, city, position):
         self.src = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/login'
+        self.src2 = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/jksb?ptopid={ptosid}&sid={sid}&fun2='
 
         self.key = key
         self.province = province
@@ -32,7 +33,9 @@ class Jkdk:
         self._upw = upw  # 密码
         self.ptopid = ''
         self.sid = ''
-        self.form = {}
+        self.form2 = {}
+        self.form1 = {}
+        self.fun18 = ''
 
     def encode(self, page):
         text = page.text.encode(page.encoding).decode(page.apparent_encoding)
@@ -65,11 +68,9 @@ class Jkdk:
             return False
 
     # 判断是否已经打过卡
-    def ifSigned(self, text) -> bool:
-        bs4 = BeautifulSoup(text, 'lxml')
-        body = bs4.find('span')
-        text = body.string
-        print(text)
+    def ifSigned(self, body) -> bool:
+        sign = body.find('span')
+        text = sign.contents[0]
         # 少考虑了填报不成功的情况
         if text == '今日您还没有填报过' or text == '今日您未成功填报过，请重新上报':
             return False
@@ -79,7 +80,7 @@ class Jkdk:
     def jkdk1(self, session):
         try:
             data = self.data
-            data['hh28'] = '907'
+            data['hh28'] = '729'
             data['smbtn'] = '进入健康状况上报平台'
             page = session.post(self.src, data=data,
                                 headers=self.headers)
@@ -93,7 +94,7 @@ class Jkdk:
             outputs = self.strSearch('ptopid=(.*)&sid=(.*)', self.src)
             self.ptopid = outputs.group(1)
             self.sid = outputs.group(2)
-            # print(self.ptopid, self.sid)
+            print(self.ptopid, self.sid, self.src)
         except requests.exceptions.SSLError as e:
             print(str(e))
 
@@ -110,19 +111,46 @@ class Jkdk:
                 self.push_err('打卡失败，应该是你学号密码写错了')
         return True
 
-    def jkdk2(self, session):
+    # get fun18 value
+    def jkdk2(self, session) -> bool:
+        headers = self.headers
+        headers['Referer'] = self.src
+        page = session.get(self.src2.format(ptosid=self.ptopid, sid=self.sid))
+        text = self.encode(page)
+        bs4 = BeautifulSoup(text, 'lxml')
+        body = bs4.find('form', attrs={'name': "myform52"})
+        hidden = body.find_all(name='input', attrs={'type': 'hidden'})
+        fun18 = hidden[2].get('value')
+        self.fun18 = fun18
+        print(f'fun18={fun18}')
+
+        # 判断是否已经打过卡
+        if self.ifSigned(body) is True:
+            print('您已经打过卡了')
+            if self.key is not None:
+                requests.post(self.url, json={
+                              'uid': self.key, 'content': '您已经打过卡了'})
+                print('微信推送成功')
+            return False
+        return True
+
+    def get_form1(self, data):
         data = self.data
         data['did'] = '1'
         data['door'] = ''
-        data['fun18'] = '819'
         data['men6'] = 'a'
         data['ptopid'] = self.ptopid
         data['sid'] = self.sid
+        data['fun18'] = self.fun18
+        self.form1 = data
 
-        page = session.post(self.src, headers=self.headers, data=data)
+    def jkdk3(self, session):
+        self.get_form1(self.data)
+
+        page = session.post(self.src, headers=self.headers, data=self.form1)
         text = self.encode(page=page)
 
-        with open('test2.html', 'w') as f:
+        with open('test3.html', 'w') as f:
             f.write(text)
 
         self.src = self.parse(text=text, label='iframe', attrs={
@@ -131,12 +159,12 @@ class Jkdk:
         self.ptopid = outputs.group(1)
         self.sid = outputs.group(2)
 
-    def jkdk3(self, session):
+    def jkdk4(self, session):
 
         form = {
             'did': '1',
             'men6': 'a',
-            'fun18': '819',
+            'fun18': self.fun18,
             'ptopid': self.ptopid,
             'sid': self.sid,
         }
@@ -145,21 +173,11 @@ class Jkdk:
         page = session.post(self.src, headers=self.headers, data=form)
         text = self.encode(page)
 
-        with open('test3.html', 'w') as f:
+        with open('test4.html', 'w') as f:
             f.write(text)
 
-        # # 判断是否已经打过卡
-        # if self.ifSigned(text) is True:
-        #     print('您已经打过卡了')
-        #     if self.key is not None:
-        #         requests.post(self.url, json={
-        #                       'uid': self.key, 'content': '您已经打过卡了'})
-        #         print('微信推送成功')
-        #     return False
-
-        self.src = self.parse(text=text, label='form', attrs={
-            'name': 'myform52'}, target='action')
-        return True
+        self.get_form2(
+            text=text, label='form', attrs={'name': 'myform52'})
 
     def get_form2(self, text, label: str, attrs: dict):
         bs4 = BeautifulSoup(text, 'lxml')
@@ -167,46 +185,24 @@ class Jkdk:
 
         data = body.find_all('input')
         for i in data:
-            self.form[i.get('name')] = i.get('value')
-        self.form["myvs_13a"] = self.province
-        self.form["myvs_13b"] = self.city
-        self.form["myvs_13c"] = self.position
-        self.form['myvs_26'] = '2'
-        self.form['did'] = '2'
-        self.form['men6'] = 'a'
-        self.form['fun18'] = '819'
-        self.form['ptopid'] = self.ptopid
-        self.form['sid'] = self.sid
-        self.form['sheng6'] = ''
-        self.form['shi6'] = ''
-        self.form['jingdu'] = '113.631419'
-        self.form['weidu'] = '34.753439'
-
-    def jkdk4(self, session):
-
-        form1 = {
-            'did': '1',
-            'door': '',
-            'men6': 'a',
-            'fun18': '819',
-            'fun3': '',
-            'ptopid': self.ptopid,
-            'sid': self.sid,
-        }
-
-        page = session.post(self.src, data=form1, headers=self.headers)
-        text = self.encode(page=page)
-
-        with open('test4.html', 'w') as f:
-            f.write(text)
-
-        self.get_form2(text=text, label='form', attrs={'name': 'myform52'})
-        self.src = self.parse(text=text, label='form', attrs={
-            'name': 'myform52'}, target='action')
+            self.form2[i.get('name')] = i.get('value')
+        self.form2["myvs_13a"] = self.province
+        self.form2["myvs_13b"] = self.city
+        self.form2["myvs_13c"] = self.position
+        self.form2['myvs_26'] = '2'
+        self.form2['did'] = '2'
+        self.form2['men6'] = 'a'
+        self.form2['fun18'] = self.fun18
+        self.form2['ptopid'] = self.ptopid
+        self.form2['sid'] = self.sid
+        self.form2['sheng6'] = ''
+        self.form2['shi6'] = ''
+        self.form2['jingdu'] = '113.631419'
+        self.form2['weidu'] = '34.753439'
 
     def jkdk5(self, session) -> bool:
 
-        page = session.post(self.src, data=self.form,
+        page = session.post(self.src, data=self.form2,
                             headers=self.headers)  # 填表
 
         text = self.encode(page)
@@ -239,12 +235,7 @@ class Jkdk:
         session = requests.Session()
         res = self.jkdk1(session)
         if res:
-            self.jkdk2(session=session)
-            self.jkdk3(session)
-            self.jkdk4(session=session)
-            result = self.jkdk5(session=session)
-            # return result
-            # else:
-            # return False
-        # else:
-            # return False
+            if self.jkdk2(session=session):
+                self.jkdk3(session)
+                self.jkdk4(session=session)
+                res = self.jkdk5(session=session)
