@@ -197,8 +197,8 @@ class Jkdk:
         self.form2['sid'] = self.sid
         self.form2['sheng6'] = ''
         self.form2['shi6'] = ''
-        self.form2['jingdu'] = '113.631419'
-        self.form2['weidu'] = '34.753439'
+        self.form2['jingdu'] = '113.534090'
+        self.form2['weidu'] = '34.813699'
 
     def jkdk5(self, session) -> bool:
 
@@ -214,9 +214,7 @@ class Jkdk:
         body = bs4.find('form', attrs={'name': 'myform52'})
 
         text = body.get_text()
-
-        output = re.findall('感谢你今日上报健康状况', text)
-
+        output = re.findall('感谢', text)
         if len(output):
             print('好耶')
             if self.key is not None:
