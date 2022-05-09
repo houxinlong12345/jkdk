@@ -16,7 +16,7 @@ class Jkdk:
         self.province = province
         self.city = city
         self.position = position
-        self.url = 'https://service-rnuqqxkb-1300650038.sh.apigw.tencentcs.com/release/getuid'
+        self.url = 'https://jkdk-zzu-jkdk-rzitjiielh.cn-hangzhou.fcapp.run//getuid'
 
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:98.0) Gecko/20100101 Firefox/98.0',
@@ -71,11 +71,12 @@ class Jkdk:
     def ifSigned(self, body) -> bool:
         sign = body.find('span')
         text = sign.contents[0]
-        # 少考虑了填报不成功的情况
-        if text == '今日您还没有填报过' or text == '今日您未成功填报过，请重新上报':
-            return False
-        else:
+        print(f'text={text}')
+        # 解决有时候乱码的情况
+        if text == '今日您已经填报过了':
             return True
+        else:
+            return False
 
     def jkdk1(self, session):
         try:
@@ -115,8 +116,11 @@ class Jkdk:
     def jkdk2(self, session) -> bool:
         headers = self.headers
         headers['Referer'] = self.src
-        page = session.get(self.src2.format(ptosid=self.ptopid, sid=self.sid))
+        page = session.get(self.src2.format(
+            ptosid=self.ptopid, sid=self.sid), headers=headers)
         text = self.encode(page)
+        with open('test2.html', 'w') as f:
+            f.write(text)
         bs4 = BeautifulSoup(text, 'lxml')
         body = bs4.find('form', attrs={'name': "myform52"})
         hidden = body.find_all(name='input', attrs={'type': 'hidden'})
@@ -199,6 +203,7 @@ class Jkdk:
         self.form2['shi6'] = ''
         self.form2['jingdu'] = '113.534090'
         self.form2['weidu'] = '34.813699'
+        self.form2['myvs_9'] = 'y'
 
     def jkdk5(self, session) -> bool:
 
