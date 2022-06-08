@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 
 class Jkdk:
-    def __init__(self, uid, upw, key, province, city, position):
+    def __init__(self, uid, upw, key, province, city, position, myvs_26=None):
         self.src = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/login'
         self.src2 = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/jksb?ptopid={ptosid}&sid={sid}&fun2='
 
@@ -36,6 +36,7 @@ class Jkdk:
         self.form2 = {}
         self.form1 = {}
         self.fun18 = ''
+        self.myvs_26 = myvs_26 if myvs_26 else '2'
 
     def encode(self, page):
         text = page.text.encode(page.encoding).decode(page.apparent_encoding)
@@ -193,7 +194,7 @@ class Jkdk:
         self.form2["myvs_13a"] = self.province
         self.form2["myvs_13b"] = self.city
         self.form2["myvs_13c"] = self.position
-        self.form2['myvs_26'] = '2'
+        self.form2['myvs_26'] = self.myvs_26
         self.form2['did'] = '2'
         self.form2['men6'] = 'a'
         self.form2['fun18'] = self.fun18
