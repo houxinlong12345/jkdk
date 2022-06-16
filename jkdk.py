@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 
 class Jkdk:
-    def __init__(self, uid, upw, key, province, city, position, myvs_26=None):
+    def __init__(self, uid, upw, key, province, city, position, myvs_26=None, jingdu=0, weidu=0):
         self.src = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/login'
         self.src2 = 'https://jksb.v.zzu.edu.cn/vls6sss/zzujksb.dll/jksb?ptopid={ptosid}&sid={sid}&fun2='
 
@@ -16,6 +16,8 @@ class Jkdk:
         self.province = province
         self.city = city
         self.position = position
+        self.jingdu=jingdu
+        self.weidu=weidu
         self.url = 'https://jkdk-zzu-jkdk-rzitjiielh.cn-hangzhou.fcapp.run//getuid'
 
         self.headers = {
@@ -75,7 +77,7 @@ class Jkdk:
         print(f'text={text}')
         # 解决有时候乱码的情况
         if text == '今日您已经填报过了':
-            return True
+            return False
         else:
             return False
 
@@ -202,8 +204,8 @@ class Jkdk:
         self.form2['sid'] = self.sid
         self.form2['sheng6'] = ''
         self.form2['shi6'] = ''
-        self.form2['jingdu'] = '113.534090'
-        self.form2['weidu'] = '34.813699'
+        self.form2['jingdu'] = self.jingdu # '113.534090'
+        self.form2['weidu'] = self.weidu # '34.813699'
         self.form2['myvs_9'] = 'y'
 
     def jkdk5(self, session) -> bool:

@@ -16,7 +16,9 @@ province = os.environ.get('province')
 city = os.environ.get('city')
 position = os.environ.get('position')
 city = province+city
-myvs_26 = os.environ.get('myvs_26')
+myvs_26 = os.environ.get('myvs_26', 2)
+jingdu = os.environ.get('jingdu', '113.534090')
+weidu = os.environ.get('weidu', '34.813699')
 
 
 print(f'username={username}')
@@ -25,9 +27,11 @@ print(f'SCKEY={key}')
 print(f'province={province}')
 print(f'city={city}')
 print(f'position={position}')
+print(f'longitude={jingdu}')
+print(f'gratitude={weidu}')
 
 if key == '':
     key = None
 m = Jkdk(username, password, key, province=province,
-         city=city, position=position, myvs_26=myvs_26)
+         city=city, position=position, myvs_26=myvs_26, jingdu=jingdu, weidu=weidu)
 m.jkdk()
