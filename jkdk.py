@@ -224,7 +224,7 @@ class Jkdk:
         text = body.get_text()
         output = re.findall('感谢', text)
         if len(output):
-            print('好耶')
+            print('好唉')
             if self.key is not None:
                 requests.post(self.url, json={
                               'uid': self.key, 'content': '打卡成功'})
